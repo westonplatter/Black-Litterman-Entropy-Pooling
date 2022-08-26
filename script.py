@@ -1,12 +1,12 @@
-import numpy
+import numpy as np
+import pandas as pd
 import scipy.optimize
-import pandas
 
 def probability_constraint(x):
     j, n = x.shape
 
-    Aeq = numpy.ones([1, j])
-    beq = numpy.array([1.])
+    Aeq = np.ones([1, j])
+    beq = np.array([1.])
 
     return [Aeq, beq]
 
@@ -21,7 +21,7 @@ def rank_view(x, p, lower, upper):
     if A.ndim == 1:
         A = A.reshape(1, j)
 
-    b = numpy.zeros([A.shape[0], 1])
+    b = np.zeros([A.shape[0], 1])
 
     return [A, b]
 
@@ -36,11 +36,11 @@ def mean_qualitative_view(x, p, c, multiplier):
 
     j, n = x.shape
 
-    m = numpy.mean(x[:, c])
-    s = numpy.std(x[:, c])
+    m = np.mean(x[:, c])
+    s = np.std(x[:, c])
 
     A = x[:, c].transpose().reshape(1, j)
-    b = numpy.array([m + multiplier * s])
+    b = np.array([m + multiplier * s])
 
     return [A, b]
 
@@ -56,11 +56,11 @@ def mean_qualitative_relative_view(x, p, first, second, multiplier):
     j, n = x.shape
 
     v = x[:, first] - x[:, second]
-    m = numpy.mean(v)
-    s = numpy.std(v)
+    m = np.mean(v)
+    s = np.std(v)
 
     A = v.transpose().reshape(1, j)
-    b = numpy.array([m + multiplier * s])
+    b = np.array([m + multiplier * s])
 
     return [A, b]
 
@@ -75,22 +75,22 @@ def median_view(x, p, c, q):
 
     j, n = x.shape
 
-    v = numpy.abs(x[:, c])
-    i_sort = numpy.argsort(v)
+    v = np.abs(x[:, c])
+    i_sort = np.argsort(v)
     v_sort = v[i_sort]
 
-    f = numpy.cumsum(p[i_sort])
+    f = np.cumsum(p[i_sort])
 
-    i_ref = numpy.max(numpy.where(f <= q))
+    i_ref = np.max(np.where(f <= q))
     v_ref = v_sort[i_ref]
 
-    i_select = numpy.where(v <= v_ref)
+    i_select = np.where(v <= v_ref)
 
-    a = numpy.zeros(1, j)
+    a = np.zeros(1, j)
     a[i_select] = 1.
 
     A = a
-    b = numpy.array([0.5])
+    b = np.array([0.5])
 
     return [A, b]
 
@@ -101,11 +101,11 @@ def volatility_qualitative_view(x, p, c, multiplier):
     """
     j, n = x.shape
 
-    m = numpy.mean(x[:, c])
-    s = numpy.std(x[:, c])
+    m = np.mean(x[:, c])
+    s = np.std(x[:, c])
 
-    A = numpy.square(x[:, c] - m).transpose().reshape(1, j)
-    b = numpy.array([m ** 2 + (multiplier * s) ** 2])
+    A = np.square(x[:, c] - m).transpose().reshape(1, j)
+    b = np.array([m ** 2 + (multiplier * s) ** 2])
 
     return [A, b]
 
@@ -120,11 +120,11 @@ def correlation_view(x, p, first, second, corr):
     j, n = x.shape
     v = x[:, first] * x[:, second]
 
-    m = numpy.mean(x[:, first]) * numpy.mean(x[:, second])
-    s = numpy.std(x[:, first]) * numpy.std(x[:, second])
+    m = np.mean(x[:, first]) * np.mean(x[:, second])
+    s = np.std(x[:, first]) * np.std(x[:, second])
 
     Aeq = v.transpose().reshape(1, j)
-    beq = numpy.array([m + s * corr])
+    beq = np.array([m + s * corr])
     
     return [Aeq, beq]
 
@@ -144,7 +144,7 @@ def entropy_program(p, A, b, Aeq, beq):
     if k_ + k < 0:
         raise Exception("Must have at least 1 equality or inequality view")
 
-    if abs(numpy.sum(p) - 1.) > 1e-8:
+    if abs(np.sum(p) - 1.) > 1e-8:
         raise Exception("Probabilities must sum to 1.")
 
     if Aeq.shape[0] != beq.shape[0]:
@@ -162,34 +162,34 @@ def entropy_program(p, A, b, Aeq, beq):
     Aeq_ = Aeq.transpose()
     beq_ = beq.transpose()
 
-    x0 = numpy.zeros([k_ + k, 1]) # starting guess for optimization; length = number of views 
+    x0 = np.zeros([k_ + k, 1]) # starting guess for optimization; length = number of views 
 
     # if we only have equality constraints
     if k_ == 0:
 
         def gradient_u(v):
             v = v.reshape(len(v), 1)
-            x = numpy.exp(numpy.log(p) - 1 - Aeq_.dot(v))
-            x = numpy.clip(x, 1e-32, numpy.inf)
+            x = np.exp(np.log(p) - 1 - Aeq_.dot(v))
+            x = np.clip(x, 1e-32, np.inf)
             return beq - Aeq.dot(x)
 
         """
         def hessian_u(v):
             v = v.reshape(len(v), 1)
-            x = numpy.exp(numpy.log(p) - 1 - Aeq_.dot(v))
-            x = numpy.clip(x, 1e-32, numpy.inf)
-            return Aeq.dot(numpy.multiply(x.dot(numpy.ones(1, k)), Aeq_)) # Hessian computed by Chen Qing, Lin Daimin, Meng Yanyan, Wang
+            x = np.exp(np.log(p) - 1 - Aeq_.dot(v))
+            x = np.clip(x, 1e-32, np.inf)
+            return Aeq.dot(np.multiply(x.dot(np.ones(1, k)), Aeq_)) # Hessian computed by Chen Qing, Lin Daimin, Meng Yanyan, Wang
         """
 
         def fmin_u(v):
             v = v.reshape(len(v), 1)
-            x = numpy.exp(numpy.log(p) - 1 - Aeq_.dot(v))
-            x = numpy.clip(x, 1e-32, numpy.inf)
-            L = x.transpose().dot(numpy.log(x) - numpy.log(p) + Aeq_.dot(v)) - beq_.dot(v)
+            x = np.exp(np.log(p) - 1 - Aeq_.dot(v))
+            x = np.clip(x, 1e-32, np.inf)
+            L = x.transpose().dot(np.log(x) - np.log(p) + Aeq_.dot(v)) - beq_.dot(v)
 
             return -L
 
-        result = scipy.optimize.minimize(fmin_u, x0, method = 'L-BFGS-B', jac = gradient_u, tol=1e-6, options = {'ftol': 1e2 * numpy.finfo(float).eps})
+        result = scipy.optimize.minimize(fmin_u, x0, method = 'L-BFGS-B', jac = gradient_u, tol=1e-6, options = {'ftol': 1e2 * np.finfo(float).eps})
         
         if not result.success:
             raise Exception("Optimization failed.  Status " + str(result.status) + ".  Cause: " + result.message)
@@ -198,12 +198,12 @@ def entropy_program(p, A, b, Aeq, beq):
 
         v = result.x
         v = v.reshape(len(v), 1)
-        p_ = numpy.exp(numpy.log(p) - 1 - Aeq_.dot(v))
+        p_ = np.exp(np.log(p) - 1 - Aeq_.dot(v))
 
 
     # inequality constraints are specified
     else: 
-        inq_mat = -numpy.eye(k_ + k)
+        inq_mat = -np.eye(k_ + k)
         inq_mat = inq_mat[:k_,:]
 
         inq_constraint = lambda x: inq_mat.dot(x)
@@ -214,25 +214,25 @@ def entropy_program(p, A, b, Aeq, beq):
             
             l = lv[:k_]
             v = lv[k_:]
-            x = numpy.exp(numpy.log(p) - 1 - A_.dot(l) - Aeq_.dot(v))
-            x = numpy.clip(x, 1e-32, numpy.inf)
+            x = np.exp(np.log(p) - 1 - A_.dot(l) - Aeq_.dot(v))
+            x = np.clip(x, 1e-32, np.inf)
 
-            return numpy.vstack((b - A.dot(x), beq - Aeq.dot(x)))
+            return np.vstack((b - A.dot(x), beq - Aeq.dot(x)))
 
         def fmin_c(lv):
             lv = lv.reshape(len(lv), 1)
 
-            log_p = numpy.log(p)
+            log_p = np.log(p)
 
             l = lv[:k_]
             v = lv[k_:]
-            x = numpy.exp(log_p - 1 - A_.dot(l) - Aeq_.dot(v))
-            x = numpy.clip(x, 1e-32, numpy.inf)
+            x = np.exp(log_p - 1 - A_.dot(l) - Aeq_.dot(v))
+            x = np.clip(x, 1e-32, np.inf)
 
             ineq = A.dot(x) - b
             eq = Aeq.dot(x) - beq
 
-            L = x.transpose().dot(numpy.log(x) - log_p) + l.transpose().dot(ineq) + v.transpose().dot(eq)
+            L = x.transpose().dot(np.log(x) - log_p) + l.transpose().dot(ineq) + v.transpose().dot(eq)
 
             return -L
 
@@ -240,7 +240,7 @@ def entropy_program(p, A, b, Aeq, beq):
                 'fun': inq_constraint, 
                 'jac': jac_constraint}
 
-        result = scipy.optimize.minimize(fmin_c, x0, method='SLSQP', jac = gradient_c, constraints = cons, tol=1e-6, options = {'ftol': 1e2 * numpy.finfo(float).eps})
+        result = scipy.optimize.minimize(fmin_c, x0, method='SLSQP', jac = gradient_c, constraints = cons, tol=1e-6, options = {'ftol': 1e2 * np.finfo(float).eps})
         
         if not result.success:
             raise Exception("Optimization failed.  Status " + str(result.status) + ".  Cause: " + result.message)
@@ -251,11 +251,11 @@ def entropy_program(p, A, b, Aeq, beq):
         lv = lv.reshape(len(lv), 1)
         l = lv[0:k_]
         v = lv[k_:]
-        p_ = numpy.exp(numpy.log(p) - 1 - A_.dot(l) - Aeq_.dot(v))
+        p_ = np.exp(np.log(p) - 1 - A_.dot(l) - Aeq_.dot(v))
 
 
-    if not (abs(1. - numpy.sum(p_)) < 1e-3):
-        print(numpy.sum(p_))
+    if not (abs(1. - np.sum(p_)) < 1e-3):
+        print(np.sum(p_))
         raise Exception("Sum of posterior probabilities is not equal to 1.")
 
     return p_
@@ -270,7 +270,7 @@ def merge_prior_posterior(p, p_, x, c):
     p_ = (1. - c) * p + c * p_
     exps = x.transpose().dot(p_)
 
-    scnd_mom = x.transpose().dot(numpy.multiply(x, p_.dot(numpy.ones([1, n]))))
+    scnd_mom = x.transpose().dot(np.multiply(x, p_.dot(np.ones([1, n]))))
     scnd_mom = (scnd_mom + scnd_mom.transpose()) / 2
 
     covs = scnd_mom - exps.dot(exps.transpose())
@@ -281,20 +281,20 @@ def merge_prior_posterior(p, p_, x, c):
 """
 if __name__ == "__main__":
 
-    er = pandas.read_csv("cmas/er-vol.csv", index_col = 0, parse_dates = False)['ER'] / 100.
-    vol = pandas.read_csv("cmas/er-vol.csv", index_col = 0, parse_dates = False)['Vol'] / 100.
-    corr = pandas.read_csv("cmas/correlations.csv", index_col = 0, parse_dates = False)
+    er = pd.read_csv("cmas/er-vol.csv", index_col=0, parse_dates=False)['ER'] / 100.
+    vol = pd.read_csv("cmas/er-vol.csv", index_col=0, parse_dates=False)['Vol'] / 100.
+    corr = pd.read_csv("cmas/correlations.csv", index_col=0, parse_dates=False)
 
-    covariance = numpy.diag(vol.values).dot(corr).dot(numpy.diag(vol.values))
-    covariance = pandas.DataFrame(covariance, index = corr.index, columns = corr.columns)
+    covariance = np.diag(vol.values).dot(corr).dot(np.diag(vol.values))
+    covariance = pd.DataFrame(covariance, index = corr.index, columns = corr.columns)
 
     mu = er
     sigma = covariance
 
     j = 1000000
 
-    x = numpy.random.multivariate_normal(mu, sigma, j)
-    p = numpy.ones([j, 1]) / j
+    x = np.random.multivariate_normal(mu, sigma, j)
+    p = np.ones([j, 1]) / j
 
     ranks = ['Credit - High Yield', 'Equity - US Small', 'Bond - INT Treasuries', 'Credit - REITs', 'Alternative - Gold']
     rank_index = [er.index.get_loc(r) for r in ranks]
@@ -305,19 +305,19 @@ if __name__ == "__main__":
     p_ = entropy_program(p, A, b, Aeq, beq)
 
     ps = {}
-    ps['Prior'] = pandas.Series(dict(zip(range(0, len(p)), p.flatten())))
-    ps['Posterior'] = pandas.Series(dict(zip(range(0, len(p)), p_.flatten())))
+    ps['Prior'] = pd.Series(dict(zip(range(0, len(p)), p.flatten())))
+    ps['Posterior'] = pd.Series(dict(zip(range(0, len(p)), p_.flatten())))
 
-    ps = pandas.DataFrame(ps)
+    ps = pd.DataFrame(ps)
     ps.to_csv("ps.csv")
 
     mu_, sigma_ = merge_prior_posterior(p, p_, x, 1.)
 
-    mu_ = pandas.Series(mu_.flatten(), index = er.index)
+    mu_ = pd.Series(mu_.flatten(), index = er.index)
 
     expected_returns = {}
     expected_returns['Prior'] = er
     expected_returns['Posterior'] = mu_
 
-    pandas.DataFrame(expected_returns).to_csv("expected-returns.csv")
+    pd.DataFrame(expected_returns).to_csv("expected-returns.csv")
 """
