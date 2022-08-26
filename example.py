@@ -35,9 +35,15 @@ if __name__ == "__main__":
     x = np.random.multivariate_normal(mu, sigma, j)
     p = np.ones([j, 1]) / j
 
-    import pdb; pdb.set_trace()
+    ranks = [
+        # 'Alternative - Gold',
+        'Credit - High Yield', 
+        'Equity - US Small', 
+        'Bond - INT Treasuries', 
+        'Credit - REITs', 
+        'Alternative - Gold'
+    ]
 
-    ranks = ['Credit - High Yield', 'Equity - US Small', 'Bond - INT Treasuries', 'Credit - REITs', 'Alternative - Gold']
     rank_index = [er.index.get_loc(r) for r in ranks]
 
     Aeq, beq = probability_constraint(x)
@@ -50,7 +56,7 @@ if __name__ == "__main__":
     ps['Posterior'] = pd.Series(dict(zip(range(0, len(p)), p_.flatten())))
 
     ps = pd.DataFrame(ps)
-    ps.to_csv("ps.csv")
+    # ps.to_csv("ps.csv")
 
     mu_, sigma_ = merge_prior_posterior(p, p_, x, 1.)
 
@@ -60,4 +66,5 @@ if __name__ == "__main__":
     expected_returns['Prior'] = er
     expected_returns['Posterior'] = mu_
 
-    pd.DataFrame(expected_returns).to_csv("expected-returns.csv")
+    erdf = pd.DataFrame(expected_returns)
+    print(erdf)
