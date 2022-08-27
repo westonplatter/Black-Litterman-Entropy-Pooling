@@ -1,4 +1,3 @@
-from email import iterators
 import numpy as np
 import pandas as pd
 
@@ -9,8 +8,7 @@ from black_litterman_entropy_pooling import (
     merge_prior_posterior
 )
 
-
-if __name__ == "__main__":
+def test_end_to_end():
     # fictional ER (expected returns) and Vol values
     data = [
         {"asset_class": "Credit - High Yield",   "ER": 0.08, "Vol": 0.15},
@@ -26,17 +24,14 @@ if __name__ == "__main__":
     # let's make up time series values to generate a covariance matrix from it
     assets = list(df.index.values)
     np.random.seed(0)
-    cov = pd.DataFrame(np.random.randn(800, len(assets)), columns=assets).cov()
+    covariance = pd.DataFrame(np.random.randn(800, len(assets)), columns=assets).cov()
 
     mu = er
-    sigma = cov
+    sigma = covariance
 
     j = 1000000
-    # iterations = j
-    
-    # generate a bunch of "random" expected returns based  mean Expected Return and the asset covariance matrix
+
     x = np.random.multivariate_normal(mu, sigma, j)
-    # er_random_samples = x 
     p = np.ones([j, 1]) / j
 
     ranks = [
@@ -47,6 +42,7 @@ if __name__ == "__main__":
         'Credit - REITs', 
         'Alternative - Gold'
     ]
+
     rank_index = [er.index.get_loc(r) for r in ranks]
 
     Aeq, beq = probability_constraint(x)
@@ -68,4 +64,6 @@ if __name__ == "__main__":
     expected_returns['Posterior'] = mu_
 
     erdf = pd.DataFrame(expected_returns)
-    print(erdf)
+    # print(erdf)
+
+    assert len(erdf.index) > 1

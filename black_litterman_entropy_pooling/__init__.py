@@ -2,8 +2,17 @@ import numpy as np
 import pandas as pd
 import scipy.optimize
 
-def probability_constraint(x):
-    j, n = x.shape
+
+def probability_constraint(er_random_samples):
+    """Generate probability constraint given a set of randomly generated Expected Returns
+
+    Args:
+        er_random_samples (np.ndarray): _description_
+
+    Returns:
+        List[np.ndarray, np.ndarray]: _description_
+    """
+    j, n = er_random_samples.shape
 
     Aeq = np.ones([1, j])
     beq = np.array([1.])
@@ -11,11 +20,11 @@ def probability_constraint(x):
     return [Aeq, beq]
 
 
-def rank_view(x, p, lower, upper):
-    j, n = x.shape
+def rank_view(er_random_samples, p, lower, upper):
+    j, n = er_random_samples.shape
     k = len(lower)
 
-    v = x[:, lower] - x[:, upper]
+    v = er_random_samples[:, lower] - er_random_samples[:, upper]
     A = v.transpose()
 
     if A.ndim == 1:
@@ -276,48 +285,3 @@ def merge_prior_posterior(p, p_, x, c):
     covs = scnd_mom - exps.dot(exps.transpose())
 
     return exps, covs
-
-
-"""
-if __name__ == "__main__":
-
-    er = pd.read_csv("cmas/er-vol.csv", index_col=0, parse_dates=False)['ER'] / 100.
-    vol = pd.read_csv("cmas/er-vol.csv", index_col=0, parse_dates=False)['Vol'] / 100.
-    corr = pd.read_csv("cmas/correlations.csv", index_col=0, parse_dates=False)
-
-    covariance = np.diag(vol.values).dot(corr).dot(np.diag(vol.values))
-    covariance = pd.DataFrame(covariance, index = corr.index, columns = corr.columns)
-
-    mu = er
-    sigma = covariance
-
-    j = 1000000
-
-    x = np.random.multivariate_normal(mu, sigma, j)
-    p = np.ones([j, 1]) / j
-
-    ranks = ['Credit - High Yield', 'Equity - US Small', 'Bond - INT Treasuries', 'Credit - REITs', 'Alternative - Gold']
-    rank_index = [er.index.get_loc(r) for r in ranks]
-
-    Aeq, beq = probability_constraint(x)
-    A, b = rank_view(x, p, rank_index[0:-1], rank_index[1:])
-
-    p_ = entropy_program(p, A, b, Aeq, beq)
-
-    ps = {}
-    ps['Prior'] = pd.Series(dict(zip(range(0, len(p)), p.flatten())))
-    ps['Posterior'] = pd.Series(dict(zip(range(0, len(p)), p_.flatten())))
-
-    ps = pd.DataFrame(ps)
-    ps.to_csv("ps.csv")
-
-    mu_, sigma_ = merge_prior_posterior(p, p_, x, 1.)
-
-    mu_ = pd.Series(mu_.flatten(), index = er.index)
-
-    expected_returns = {}
-    expected_returns['Prior'] = er
-    expected_returns['Posterior'] = mu_
-
-    pd.DataFrame(expected_returns).to_csv("expected-returns.csv")
-"""
