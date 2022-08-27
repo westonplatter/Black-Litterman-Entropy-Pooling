@@ -2,7 +2,7 @@
 Python package implementing Attilio Meucci's [Black-Litterman Entropy Pooling Adaptation](https://ssrn.com/abstract=1213325).
 
 ## Genesis
-Back in 2017, Corey wrote a blog post, [Combining Tactical Views with Black-Litterman and Entropy Pooling](https://blog.thinknewfound.com/2017/07/combining-tactical-views-black-litterman-entropy-pooling/), describing an adaptation to Black-Litterman published by Attilio Meucci. The adaptation simplifies Black-Litterman by using rank ordering of expected relative instrument returns to generate asset weights.
+Corey Hoffstein wrote a blog post, [Combining Tactical Views with Black-Litterman and Entropy Pooling](https://blog.thinknewfound.com/2017/07/combining-tactical-views-black-litterman-entropy-pooling/), describing an adaptation to Black-Litterman published by Attilio Meucci. The adaptation simplifies Black-Litterman by using rank ordering of expected relative instrument returns to generate asset weights.
 
 ## Getting started
 
@@ -23,13 +23,13 @@ Alternative - Gold      0.00  -0.002101
 ```
 
 ## Credit
-Research by Attilio Meucci, https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1213325.
-Initial code implementation by Corey Hoffstein, https://gist.github.com/choffstein/90a1be0da8800114d00abdd9c395ff2b.
-Code refinement and packaging by Weston Platter, https://github.com/westonplatter/Black-Litterman-Entropy-Pooling/.
+Research: Attilio Meucci, https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1213325.  
+Initial code implementation: Corey Hoffstein, https://gist.github.com/choffstein/90a1be0da8800114d00abdd9c395ff2b.  
+Code refinement and packaging: Weston Platter, https://github.com/westonplatter/Black-Litterman-Entropy-Pooling/.  
 
-Here's the tweet that started the codebase.
+Here's [the tweet](https://twitter.com/choffstein/status/1562504266878558212) that started the codebase.
 
-![Tweet](tweet.png =250x)
+[<img src="tweet.png" width="400"/>](tweet.png)
 
 ## License
 Copyright (c) 2017 Corey Hoffstein, MIT License.
