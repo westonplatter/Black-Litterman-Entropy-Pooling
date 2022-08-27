@@ -1,13 +1,16 @@
 import numpy as np
 import pandas as pd
 
-from script import probability_constraint, rank_view, entropy_program, merge_prior_posterior
+from black_litterman_entropy_pooling.script import (
+    probability_constraint, 
+    rank_view, 
+    entropy_program, 
+    merge_prior_posterior
+)
 
 
 if __name__ == "__main__":
-    # er = pandas.read_csv("cmas/er-vol.csv", index_col = 0, parse_dates = False)['ER'] / 100.
-    # vol = pandas.read_csv("cmas/er-vol.csv", index_col = 0, parse_dates = False)['Vol'] / 100.
-    # fictional ER and Vol values
+    # fictional ER (expected returns) and Vol values
     data = [
         {"asset_class": "Credit - High Yield",   "ER": 0.08, "Vol": 0.15},
         {"asset_class": "Equity - US Small",     "ER": 0.06, "Vol": 0.25},
@@ -19,9 +22,6 @@ if __name__ == "__main__":
     er = df['ER']
     vol = df['Vol']
 
-    # corr = pd.read_csv("data-correlations.csv", index_col=0, parse_dates=False)
-    # covariance = np.diag(vol.values).dot(corr).dot(np.diag(vol.values))
-    # covariance = pd.DataFrame(covariance, index=corr.index, columns=corr.columns)
     # let's make up time series values to generate a covariance matrix from it
     assets = list(df.index.values)
     np.random.seed(0)
