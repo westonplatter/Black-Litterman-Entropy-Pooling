@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from black_litterman_entropy_pooling.script import (
+from black_litterman_entropy_pooling import (
     probability_constraint, 
     rank_view, 
     entropy_program, 
