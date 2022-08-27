@@ -19,7 +19,7 @@ setuptools.setup(
     packages=["black_litterman_entropy_pooling"],
     install_requires=[
         "numpy",
-        "pandas,
+        "pandas",
         "scipy",
     ],
     project_urls={
