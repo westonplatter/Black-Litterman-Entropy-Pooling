@@ -2,8 +2,17 @@ import numpy as np
 import pandas as pd
 import scipy.optimize
 
-def probability_constraint(x):
-    j, n = x.shape
+
+def probability_constraint(er_random_samples):
+    """Generate probability constraint given a set of randomly generated Expected Returns
+
+    Args:
+        er_random_samples (np.ndarray): _description_
+
+    Returns:
+        List[np.ndarray, np.ndarray]: _description_
+    """
+    j, n = er_random_samples.shape
 
     Aeq = np.ones([1, j])
     beq = np.array([1.])
@@ -11,11 +20,11 @@ def probability_constraint(x):
     return [Aeq, beq]
 
 
-def rank_view(x, p, lower, upper):
-    j, n = x.shape
+def rank_view(er_random_samples, p, lower, upper):
+    j, n = er_random_samples.shape
     k = len(lower)
 
-    v = x[:, lower] - x[:, upper]
+    v = er_random_samples[:, lower] - er_random_samples[:, upper]
     A = v.transpose()
 
     if A.ndim == 1:
