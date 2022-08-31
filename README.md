@@ -4,15 +4,15 @@ Python package implementing Attilio Meucci's [Black-Litterman Entropy Pooling Ad
 ## Genesis
 Corey Hoffstein wrote a blog post, [Combining Tactical Views with Black-Litterman and Entropy Pooling](https://blog.thinknewfound.com/2017/07/combining-tactical-views-black-litterman-entropy-pooling/), describing an adaptation to Black-Litterman published by Attilio Meucci. The adaptation simplifies Black-Litterman by using rank ordering of expected relative instrument returns to generate asset weights.
 
-## Getting started
-
-TODO - update as the code changes
+## Quick Start
+The easiest way to get started is download the code and run the example.
 
 ```
+git clone git@github.com:westonplatter/Black-Litterman-Entropy-Pooling.git
+cd Black-Litterman-Entropy-Pooling
 pip install -r requirements.txt
 python example.py
 
-$ python example.py
                        Prior  Posterior
 asset_class                            
 Credit - High Yield     0.08   0.079390

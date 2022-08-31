@@ -54,14 +54,14 @@ if __name__ == "__main__":
 
     p_ = entropy_program(p, A, b, Aeq, beq)
 
+    # this seems confusing
+    # let's find a more direct way to get to, [mu_, sigma_]
     ps = {}
     ps['Prior'] = pd.Series(dict(zip(range(0, len(p)), p.flatten())))
     ps['Posterior'] = pd.Series(dict(zip(range(0, len(p)), p_.flatten())))
     ps = pd.DataFrame(ps)
-
     mu_, sigma_ = merge_prior_posterior(p, p_, x, 1.)
-
-    mu_ = pd.Series(mu_.flatten(), index = er.index)
+    mu_ = pd.Series(mu_.flatten(), index=er.index)
 
     expected_returns = {}
     expected_returns['Prior'] = er

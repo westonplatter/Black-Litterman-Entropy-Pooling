@@ -4,7 +4,8 @@ import scipy.optimize
 
 
 def probability_constraint(er_random_samples):
-    """Generate probability constraint given a set of randomly generated Expected Returns
+    """
+    Generate probability constraint given a set of randomly generated Expected Returns
 
     Args:
         er_random_samples (np.ndarray): _description_
@@ -254,18 +255,14 @@ def entropy_program(p, A, b, Aeq, beq):
         if not result.success:
             raise Exception("Optimization failed.  Status " + str(result.status) + ".  Cause: " + result.message)
 
-        #print result 
-
         lv = result.x
         lv = lv.reshape(len(lv), 1)
         l = lv[0:k_]
         v = lv[k_:]
         p_ = np.exp(np.log(p) - 1 - A_.dot(l) - Aeq_.dot(v))
 
-
     if not (abs(1. - np.sum(p_)) < 1e-3):
-        print(np.sum(p_))
-        raise Exception("Sum of posterior probabilities is not equal to 1.")
+        raise Exception(f"Sum of posterior probabilities is not equal to 1 (value = {np.sum(p_)})")
 
     return p_
 
